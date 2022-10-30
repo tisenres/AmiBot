@@ -58,16 +58,12 @@ async def process_schedule_message(message: types.Message):
         
         buttons_of_sections = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=number_of_sections)
         
-        # Create list and IN LOOP we fill our list with BUTTONS. Number of buttons depends on number_of_sections variable
-        
-        buttons = []
+        # Create LOOP and fill our markup with BUTTONS. Number of buttons depends on number_of_sections variable
         
         for i in range(number_of_sections):
             button = types.KeyboardButton(str(i + 1) + ' section')
-            buttons.append(button)
+            buttons_of_sections.row(button)
             
-        buttons_of_sections.row(buttons)
-        
         # Send clarifying message and show SECTIONS BUTTONS to user
         
         await bot.send_message(message.from_user.id, '<b>Choose the section</b> ↓', parse_mode='html',
