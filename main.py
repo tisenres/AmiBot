@@ -10,71 +10,104 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 
-number_of_sections = 4
-
-
 @dp.message_handler(commands=['start', 'help'])
 async def process_start_help_commands(message: types.Message):
     
-    # Create common Markup to SHOW SCHEDULE (for both START and HELP)
-    
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    schedule = types.KeyboardButton('Show schedule')
-    markup.add(schedule)
-
-    
-    # Do some actions in case START or HELP
-    
+    show_schedule = types.InlineKeyboardMarkup()
+    schedule = types.InlineKeyboardButton('Show schedule', callback_data='show_schedule')
+    show_schedule.add(schedule)
     
     if message.text == '/start':
     
-        # Send welcome sticker
-        
-        sticker = open('welcome_stickers/%d.tgs' % randint(1, 4), 'rb')
+        sticker = open("welcome_stickers/%d.tgs" % randint(1, 4), "rb")
         await bot.send_sticker(message.chat.id, sticker)
-
-        # Send welcome message
         
         await bot.send_message(message.chat.id,
                                "<b>Hello, %s! 👋\n</b>My name is AmiBot!\nI can show You the schedule of lessons of Amity University!" % message.from_user.first_name,
-                               parse_mode='html', reply_markup=markup)
+                               parse_mode='html', reply_markup=show_schedule)
         
     elif message.text == '/help':
         
-        # Send help message
-        
-        await bot.send_message(message.chat.id, 'Click on the button <b><u>Show schedule</u></b> ↓', parse_mode='html',
-                               reply_markup=markup)
+        await bot.send_message(message.chat.id, 'This bot helps You to check lessons schedule at Amity University. \nClick on the button <b>below↓</b>', parse_mode='html',
+                               reply_markup=show_schedule)
 
 
-@dp.message_handler(content_types=['text'])
+@dp.callback_query_handler(text='show_schedule')
+async def show_schedule(callback: types.CallbackQuery):
+    weekday = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    monday = types.KeyboardButton('Monday')
+    tuesday = types.KeyboardButton('Tuesday')
+    wednesday = types.KeyboardButton('Wednesday')
+    thursday = types.KeyboardButton('Thursday')
+    friday = types.KeyboardButton('Friday')
+    weekday.add(monday, tuesday, wednesday, thursday, friday)
+
+    await bot.send_message(callback.message.chat.id, 'Choose <b>weekday</b>', parse_mode='html', reply_markup=weekday)
+    await bot.answer_callback_query(callback.id)
+    
+@dp.message_handler(text='Monday')
+async def process_monday_message(message: types.Message):
+    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    section1 = types.KeyboardButton('Section 1')
+    section2 = types.KeyboardButton('Section 2')
+    section3 = types.KeyboardButton('Section 3')
+    section4 = types.KeyboardButton('Section 4')
+    choose_section.add(section1, section2, section3, section4)
+    
+    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html', reply_markup=choose_section)
+
+
+@dp.message_handler(text='Tuesday')
+async def process_monday_message(message: types.Message):
+    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    section1 = types.KeyboardButton('Section 1')
+    section2 = types.KeyboardButton('Section 2')
+    section3 = types.KeyboardButton('Section 3')
+    section4 = types.KeyboardButton('Section 4')
+    choose_section.add(section1, section2, section3, section4)
+    
+    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
+                           reply_markup=choose_section)
+
+
+@dp.message_handler(text='Wednesday')
+async def process_monday_message(message: types.Message):
+    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    section1 = types.KeyboardButton('Section 1')
+    section2 = types.KeyboardButton('Section 2')
+    section3 = types.KeyboardButton('Section 3')
+    section4 = types.KeyboardButton('Section 4')
+    choose_section.add(section1, section2, section3, section4)
+    
+    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
+                           reply_markup=choose_section)
+
+
+@dp.message_handler(text='Thursday')
+async def process_monday_message(message: types.Message):
+    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    section1 = types.KeyboardButton('Section 1')
+    section2 = types.KeyboardButton('Section 2')
+    section3 = types.KeyboardButton('Section 3')
+    section4 = types.KeyboardButton('Section 4')
+    choose_section.add(section1, section2, section3, section4)
+    
+    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
+                           reply_markup=choose_section)
+
+
+@dp.message_handler(text='Friday')
+async def process_monday_message(message: types.Message):
+    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    section2 = types.KeyboardButton('Section 2')
+    choose_section.add(section2)
+    
+    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
+                           reply_markup=choose_section)
+
+@dp.message_handler()
 async def process_schedule_message(message: types.Message):
-    
-    # Do some actions in case SHOW SCHEDULE or UNKNOWN TEXT
-    
-    if message.text == 'Show schedule':
-    
-        # Create Markup to CLARIFY SCHEDULE SEARCH
-        
-        buttons_of_sections = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=number_of_sections)
-        
-        # Create LOOP and fill our markup with BUTTONS. Number of buttons depends on number_of_sections variable
-        
-        for i in range(number_of_sections):
-            button = types.KeyboardButton(str(i + 1) + ' section')
-            buttons_of_sections.row(button)
-            
-        # Send clarifying message and show SECTIONS BUTTONS to user
-        
-        await bot.send_message(message.from_user.id, '<b>Choose the section</b> ↓', parse_mode='html',
-                               reply_markup=buttons_of_sections)
-        
-    else:
-        
-        # Send special message for unknown text
-        
-        await bot.send_message(message.from_user.id, "Sorry, I didn't understand Your request😢. Send command /start")
-    
+    await bot.send_message(message.from_user.id, "Sorry, I didn't understand Your request😢. Send command /help")
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
