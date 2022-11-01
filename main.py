@@ -1,4 +1,5 @@
 from random import randint
+from datetime import datetime
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -34,76 +35,77 @@ async def process_start_help_commands(message: types.Message):
 
 @dp.callback_query_handler(text='show_schedule')
 async def show_schedule(callback: types.CallbackQuery):
-    weekday = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    monday = types.KeyboardButton('Monday')
-    tuesday = types.KeyboardButton('Tuesday')
-    wednesday = types.KeyboardButton('Wednesday')
-    thursday = types.KeyboardButton('Thursday')
-    friday = types.KeyboardButton('Friday')
-    weekday.add(monday, tuesday, wednesday, thursday, friday)
+    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    section1 = types.KeyboardButton('Section 1')
+    section2 = types.KeyboardButton('Section 2')
+    section3 = types.KeyboardButton('Section 3')
+    section4 = types.KeyboardButton('Section 4')
+    choose_section.add(section1, section2, section3, section4)
 
-    await bot.send_message(callback.message.chat.id, 'Choose <b>weekday</b>', parse_mode='html', reply_markup=weekday)
+    await bot.send_message(callback.message.chat.id, 'Choose <b>the section</b>', parse_mode='html', reply_markup=choose_section)
     await bot.answer_callback_query(callback.id)
     
-@dp.message_handler(text='Monday')
-async def process_monday_message(message: types.Message):
-    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    section1 = types.KeyboardButton('Section 1')
-    section2 = types.KeyboardButton('Section 2')
-    section3 = types.KeyboardButton('Section 3')
-    section4 = types.KeyboardButton('Section 4')
-    choose_section.add(section1, section2, section3, section4)
+@dp.message_handler(text='Section 1')
+async def process_section1_message(message: types.Message):
+    weekday = datetime.today().strftime('%A')
+    show_week_markup = types.InlineKeyboardMarkup()
+    show_week = types.InlineKeyboardButton('Show week', callback_data='show_week_sec1')
+    show_week_markup.add(show_week)
     
-    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html', reply_markup=choose_section)
+    await bot.send_message(message.from_user.id, 'THIS IS YOUR SCHEDULE FOR <b>%s</b>' % weekday, parse_mode='html', reply_markup=show_week_markup)
 
 
-@dp.message_handler(text='Tuesday')
-async def process_monday_message(message: types.Message):
-    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    section1 = types.KeyboardButton('Section 1')
-    section2 = types.KeyboardButton('Section 2')
-    section3 = types.KeyboardButton('Section 3')
-    section4 = types.KeyboardButton('Section 4')
-    choose_section.add(section1, section2, section3, section4)
+@dp.message_handler(text='Section 2')
+async def process_section2_message(message: types.Message):
+    weekday = datetime.today().strftime('%A')
+    show_week_markup = types.InlineKeyboardMarkup()
+    show_week = types.InlineKeyboardButton('Show week', callback_data='show_week_sec2')
+    show_week_markup.add(show_week)
     
-    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
-                           reply_markup=choose_section)
+    await bot.send_message(message.from_user.id, 'THIS IS YOUR SCHEDULE FOR <b>%s</b>' % weekday, parse_mode='html',
+                           reply_markup=show_week_markup)
 
 
-@dp.message_handler(text='Wednesday')
-async def process_monday_message(message: types.Message):
-    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    section1 = types.KeyboardButton('Section 1')
-    section2 = types.KeyboardButton('Section 2')
-    section3 = types.KeyboardButton('Section 3')
-    section4 = types.KeyboardButton('Section 4')
-    choose_section.add(section1, section2, section3, section4)
+@dp.message_handler(text='Section 3')
+async def process_section3_message(message: types.Message):
+    weekday = datetime.today().strftime('%A')
+    show_week_markup = types.InlineKeyboardMarkup()
+    show_week = types.InlineKeyboardButton('Show week', callback_data='show_week_sec3')
+    show_week_markup.add(show_week)
     
-    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
-                           reply_markup=choose_section)
+    await bot.send_message(message.from_user.id, 'THIS IS YOUR SCHEDULE FOR <b>%s</b>' % weekday, parse_mode='html',
+                           reply_markup=show_week_markup)
 
 
-@dp.message_handler(text='Thursday')
-async def process_monday_message(message: types.Message):
-    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    section1 = types.KeyboardButton('Section 1')
-    section2 = types.KeyboardButton('Section 2')
-    section3 = types.KeyboardButton('Section 3')
-    section4 = types.KeyboardButton('Section 4')
-    choose_section.add(section1, section2, section3, section4)
+@dp.message_handler(text='Section 4')
+async def process_section4_message(message: types.Message):
+    weekday = datetime.today().strftime('%A')
+    show_week_markup = types.InlineKeyboardMarkup()
+    show_week = types.InlineKeyboardButton('Show week', callback_data='show_week_sec4')
+    show_week_markup.add(show_week)
     
-    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
-                           reply_markup=choose_section)
-
-
-@dp.message_handler(text='Friday')
-async def process_monday_message(message: types.Message):
-    choose_section = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    section2 = types.KeyboardButton('Section 2')
-    choose_section.add(section2)
+    await bot.send_message(message.from_user.id, 'THIS IS YOUR SCHEDULE FOR <b>%s</b>' % weekday, parse_mode='html',
+                           reply_markup=show_week_markup)
     
-    await bot.send_message(message.from_user.id, 'Choose <b>the section</b>', parse_mode='html',
-                           reply_markup=choose_section)
+@dp.callback_query_handler(text='show_week_sec1')
+async def show_week_schedule_sec1(callback: types.CallbackQuery):
+    await bot.send_message(callback.message.chat.id, 'All week schedule for section 1', parse_mode='html')
+    await bot.answer_callback_query(callback.id)
+    
+@dp.callback_query_handler(text='show_week_sec2')
+async def show_week_schedule_sec2(callback: types.CallbackQuery):
+    await bot.send_message(callback.message.chat.id, 'All week schedule for section 2', parse_mode='html')
+    await bot.answer_callback_query(callback.id)
+    
+@dp.callback_query_handler(text='show_week_sec3')
+async def show_week_schedule_sec3(callback: types.CallbackQuery):
+    await bot.send_message(callback.message.chat.id, 'All week schedule for section 3', parse_mode='html')
+    await bot.answer_callback_query(callback.id)
+    
+@dp.callback_query_handler(text='show_week_sec4')
+async def show_week_schedule_sec3(callback: types.CallbackQuery):
+    await bot.send_message(callback.message.chat.id, 'All week schedule for section 4', parse_mode='html')
+    await bot.answer_callback_query(callback.id)
 
 @dp.message_handler()
 async def process_schedule_message(message: types.Message):
