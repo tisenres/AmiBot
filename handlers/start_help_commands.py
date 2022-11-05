@@ -1,12 +1,10 @@
-import datetime
 import os
 from random import randint
 
-from create_bot import bot, dp
+from create_bot import bot
 from aiogram import types, Dispatcher
 
 
-# @dp.message_handler(commands=['start', 'help'])
 async def process_start_help_commands(message: types.Message):
     show_schedule = types.InlineKeyboardMarkup()
     schedule = types.InlineKeyboardButton('Show schedule', callback_data='show_schedule')
@@ -28,8 +26,10 @@ async def process_start_help_commands(message: types.Message):
                                parse_mode='html',
                                reply_markup=show_schedule)
 
-def register_start_help_handler(dp : Dispatcher):
+
+def register_start_help_handler(dp: Dispatcher):
     dp.register_message_handler(process_start_help_commands, commands=['start', 'help'])
+
 
 def random_sticker(directory_path):
     files = os.listdir(path=".")
