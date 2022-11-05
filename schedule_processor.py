@@ -1,4 +1,5 @@
 import datetime
+import os
 from dataclasses import dataclass
 from enum import Enum
 
@@ -12,7 +13,7 @@ class Credential:
 
 
 __credentials = [
-    Credential(username="", password=""),
+    Credential(username=os.environ["section1_username"], password=os.environ["section1_password"]),
     None,
     None,
     None
