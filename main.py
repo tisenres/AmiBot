@@ -1,16 +1,11 @@
 from create_bot import dp
 from aiogram.utils import executor
 
-from handlers import start_help_commands, choose_sections, other_commands, show_schedule, show_tmr, show_week
+from handlers import start_help_handler, other_handler
 
-start_help_commands.register_start_help_handler(dp)
-choose_sections.register_handlers_choose_sections(dp)
-show_schedule.register_handlers_show_schedule(dp)
-show_tmr.register_handlers_show_tmr(dp)
-show_week.register_handlers_show_week(dp)
-other_commands.register_handlers_others(dp)
+start_help_handler.register_start_help_handler(dp)
+other_handler.register_other_handler(dp)
 
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
-    
