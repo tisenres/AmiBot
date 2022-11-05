@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 import schedule_processor
 from create_bot import bot
@@ -11,12 +12,17 @@ async def process_section1_message(message: types.Message):
     show_tmr = types.InlineKeyboardButton('Show tomorrow', callback_data='show_tmr_sec1')
     show_markup.add(show_week, show_tmr)
     
-    period_type = schedule_processor.PeriodType.TODAY
+    period_type = schedule_processor.PeriodType.WEEK
     mess_text = schedule_processor.get_schedule(1, period_type)
     
-    await bot.send_message(message.from_user.id, f'Your Schedule for <b>{period_type.value}</b>\n\n{mess_text}', parse_mode='html',
-                           reply_markup=show_markup)
+    array = json.loads(mess_text)
+    
+    await bot.send_message(message.from_user.id, f'Your Schedule for <b>{period_type.value}</b>\n\n', parse_mode='html')
 
+    for item in array:
+        await bot.send_message(message.from_user.id, f'<b>{item["start"]}</b> - {item["title"]}\n',
+                               parse_mode='html')
+        
 
 # @dp.message_handler(text='Section 2')
 async def process_section2_message(message: types.Message):
