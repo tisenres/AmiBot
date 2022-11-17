@@ -52,5 +52,5 @@ def register_start_help_handler(dp: Dispatcher):
 
 
 def random_sticker(directory_path):
-    files = os.listdir(path=".")
-    return directory_path + '/' + str(randint(1, len(files) - 1)) + '.tgs'
+    number_of_files = os.listdir(path=".")
+    return directory_path + '/' + str(randint(1, len(number_of_files) - 1)) + '.tgs'
