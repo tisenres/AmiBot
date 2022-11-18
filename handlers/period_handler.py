@@ -48,8 +48,9 @@ async def handle_period_button(message: types.Message):
         return
     
     array = json.loads(json_schedule)
-    list_of_lessons = decoder.decode_json(array, period.value)
     if len(array) > 0:
+        list_of_lessons = decoder.decode_json(array)
+        
         await bot.send_message(message.from_user.id, f'Your Schedule for <b>{period.value}</b>\n\n',
                                parse_mode='html')
         for one_day in list_of_lessons:
@@ -58,14 +59,5 @@ async def handle_period_button(message: types.Message):
     else:
         await bot.send_message(message.from_user.id, f'No schedule for <b>{period.value}</b>\n\n',
                                parse_mode='html')
-    
-    # if len(array) > 0:
-    #     await bot.send_message(message.from_user.id, f'Your Schedule for <b>{period.value}</b>\n\n',
-    #                            parse_mode='html')
-    #     for item in array:
-    #         await bot.send_message(message.from_user.id, f'<b>{item["start"]}</b> - {item["title"]}\n',
-    #                                parse_mode='html')
-    # else:
-    #     await bot.send_message(message.from_user.id, f'No schedule for <b>{period.value}</b>\n\n',
-    #                            parse_mode='html')
+        
 
