@@ -17,7 +17,7 @@ def create_period_regex():
     enum_values = []
     for enum_value in PeriodType:
         enum_values.append(enum_value.value)
-        
+    
     period_types_string = "|".join(enum_values)
     return f'^({period_types_string})\\s{SECTION_ACRONYM}\\s(\\d+)$'
 
@@ -27,7 +27,7 @@ async def create_period_markup(chat_id: int, section: str):
     for period_type in PeriodType:
         button = types.KeyboardButton(BUTTON_TITLE_FORMAT % (period_type.value, SECTION_ACRONYM, section))
         period_markup.insert(button)
-
+    
     await bot.send_message(chat_id, 'Choose period', reply_markup=period_markup)
 
 
@@ -48,16 +48,16 @@ async def handle_period_button(message: types.Message):
         return
     
     array = json.loads(json_schedule)
+    
     if len(array) > 0:
-        list_of_lessons = decoder.decode_json(array)
+        schedule_dict = decoder.group_lessons_by_day(array)
+        message_list = decoder.format_message(schedule_dict)
         
         await bot.send_message(message.from_user.id, f'Your Schedule for <b>{period.value}</b>\n\n',
                                parse_mode='html')
-        for one_day in list_of_lessons:
-            await bot.send_message(message.from_user.id, one_day,
+        for message_text in message_list:
+            await bot.send_message(message.from_user.id, message_text,
                                    parse_mode='html')
     else:
         await bot.send_message(message.from_user.id, f'No schedule for <b>{period.value}</b>\n\n',
                                parse_mode='html')
-        
-
