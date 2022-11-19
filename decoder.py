@@ -1,5 +1,6 @@
 from typing import List, Dict
 
+from design.HtmlDecorator import bold, bold_underline
 from vo.Day import Day
 from vo.Lesson import Lesson
 
@@ -28,10 +29,10 @@ def format_message(groups: Dict[str, Day]) -> List[str]:
     list_of_lessons: List[str] = []
     
     for key, day in groups.items():
-        one_day = [f'<b>{day.get_short_date()} — {day.get_weekday()}</b>\n']
+        one_day = [bold_underline(f'{day.get_short_date()} — {day.get_weekday()}\n')]
         for lesson in day.get_lessons():
             one_day.append(
-                f'<b>{lesson.get_short_start_time()}</b>   {lesson.get_title()}')
+                f'{bold(lesson.get_short_start_time())}   {lesson.get_title()}')
         list_of_lessons.append('\n'.join(one_day))
         
     return list_of_lessons

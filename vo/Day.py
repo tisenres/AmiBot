@@ -11,8 +11,8 @@ class Day:
     __lessons: List[Lesson]
     
     def __init__(self, date: str, lessons: [Lesson]):
-        self.__date = datetime.strptime(date, Constants.FORMATTER)
-        self.__weekday = datetime.strptime(date, Constants.FORMATTER).strftime("%A")
+        self.__date = datetime.strptime(date, Constants.PARSE_FORMAT)
+        self.__weekday = datetime.strptime(date, Constants.PARSE_FORMAT).strftime("%A")
         self.__lessons = lessons
     
     def get_weekday(self) -> str:

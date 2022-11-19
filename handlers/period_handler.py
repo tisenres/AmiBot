@@ -6,6 +6,7 @@ from aiogram import types
 import decoder
 import schedule_processor
 from create_bot import bot
+from design.HtmlDecorator import bold
 from handlers import other_handler
 from schedule_processor import PeriodType
 
@@ -43,7 +44,7 @@ async def handle_period_button(message: types.Message):
     try:
         json_schedule = schedule_processor.get_schedule(section_num, period)
     except NotImplementedError:
-        await bot.send_message(message.from_user.id, f'Non implemented section <b>{section_num}</b>\n\n',
+        await bot.send_message(message.from_user.id, f'Non implemented section {bold(f"{section_num}")}\n\n',
                                parse_mode='html')
         return
     
@@ -53,11 +54,11 @@ async def handle_period_button(message: types.Message):
         schedule_dict = decoder.group_lessons_by_day(array)
         message_list = decoder.format_message(schedule_dict)
         
-        await bot.send_message(message.from_user.id, f'Your Schedule for <b>{period.value}</b>\n\n',
+        await bot.send_message(message.from_user.id, f'Your Schedule for {bold(period.value)}\n\n',
                                parse_mode='html')
         for message_text in message_list:
             await bot.send_message(message.from_user.id, message_text,
                                    parse_mode='html')
     else:
-        await bot.send_message(message.from_user.id, f'No schedule for <b>{period.value}</b>\n\n',
+        await bot.send_message(message.from_user.id, f'No schedule for {bold(period.value)}\n\n',
                                parse_mode='html')

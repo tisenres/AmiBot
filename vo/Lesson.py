@@ -11,9 +11,9 @@ class Lesson:
     
     def __init__(self, title: str, date: str, start_time: str, end_time: str):
         self.__title = title
-        self.__date = datetime.strptime(date, Constants.FORMATTER)
-        self.__start_time = datetime.strptime(start_time, Constants.FORMATTER)
-        self.__end_time = datetime.strptime(end_time, Constants.FORMATTER)
+        self.__date = datetime.strptime(date, Constants.PARSE_FORMAT)
+        self.__start_time = datetime.strptime(start_time, Constants.PARSE_FORMAT)
+        self.__end_time = datetime.strptime(end_time, Constants.PARSE_FORMAT)
     
     def __str__(self) -> str:
         return self.__title
