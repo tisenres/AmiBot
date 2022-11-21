@@ -1,0 +1,4 @@
+TO-DO:
+Make button "Waiting for request"
+Add an InlineButton to each mess "Additional Info"
+Place the bot to a server
