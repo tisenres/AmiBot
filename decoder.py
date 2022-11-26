@@ -7,12 +7,13 @@ from vo.Lesson import Lesson
 
 def group_lessons_by_day(array: [str]) -> Dict[str, Day]:
     groups: Dict[str, Day] = {}
-    
     for item in array:
         lesson = Lesson(item['title'],
                         item['start'],
                         item['start'],
-                        item['end'])
+                        item['end'],
+                        item['FacultyName'],
+                        item['RoomNo'])
         key = lesson.get_key()
         
         try:
@@ -25,7 +26,7 @@ def group_lessons_by_day(array: [str]) -> Dict[str, Day]:
     return groups
 
 
-def format_message(groups: Dict[str, Day]) -> List[str]:
+def format_schedule_message(groups: Dict[str, Day]) -> List[str]:
     list_of_lessons: List[str] = []
     
     for key, day in groups.items():
@@ -36,3 +37,20 @@ def format_message(groups: Dict[str, Day]) -> List[str]:
         list_of_lessons.append('\n'.join(one_day))
         
     return list_of_lessons
+
+
+def format_schedule_message_with_add_info(groups: Dict[str, Day]) -> List[str]:
+    list_of_lessons: List[str] = []
+    
+    for key, day in groups.items():
+        one_day = [bold_underline(f'{day.get_short_date()} — {day.get_weekday()}\n')]
+        for lesson in day.get_lessons():
+            one_day.append(
+                f'{bold(lesson.get_short_start_time())}   {lesson.get_title()}\n'
+                f"{bold('RoomNo: ')}{lesson.get_room_no()}\n"
+                f"{bold('FacultyName: ')}{lesson.get_faculty_name()}\n")
+        list_of_lessons.append('\n'.join(one_day))
+    
+    return list_of_lessons
+
+

@@ -50,7 +50,10 @@ def get_auth(host: str, username: str, password: str):
     
     regex = ".ASPXAUTH=; expires=.+?(.ASPXAUTH=.+?path=/)"
     arr = re.findall(regex, auth_header_bundle)
-    auth_token = arr[0]
+    try:
+        auth_token = arr[0]
+    except IndexError:
+        raise ConnectionError
     
     return auth_token
 
@@ -64,10 +67,14 @@ def get_schedule(auth_token: str, host: str, start_day: datetime, end_day: datet
     }
 
     json_conn = http.client.HTTPSConnection(host)
-    json_conn.request("GET", f"/Calendar/home/GetDiaryEvents?start={start_day.strftime(DATE_FORMAT_STRING)}"
-                             f"&end={end_day.strftime(DATE_FORMAT_STRING)}&_=1667584748354",
-                      None,
-                      json_headers)
+    try:
+        json_conn.request("GET", f"/Calendar/home/GetDiaryEvents?start={start_day.strftime(DATE_FORMAT_STRING)}"
+                                 f"&end={end_day.strftime(DATE_FORMAT_STRING)}&_=1667584748354",
+                          None,
+                          json_headers)
+    except TypeError:
+        raise ConnectionError
+    
     json_res = json_conn.getresponse()
     json_data = json_res.read()
     

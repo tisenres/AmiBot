@@ -65,10 +65,21 @@ def get_schedule(section_num: int, period_type: PeriodType):
     if cred is None:
         raise NotImplementedError
     
-    if network.Tokens.auth_token is not None:
+    # try:
+    #     json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
+    #     json.loads(json_data)
+    # except JSONDecodeError:
+    #     auth = network.get_auth(network.HOST, cred.username, cred.password)
+    #     network.Tokens.auth_token = auth
+    #     json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
+    
+    try:
         json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
-    else:
+    except ConnectionError:
         auth = network.get_auth(network.HOST, cred.username, cred.password)
         network.Tokens.auth_token = auth
         json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
+    except IndexError:
+        raise ConnectionError
+    
     return json_data
