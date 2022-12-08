@@ -1,5 +1,4 @@
 TO-DO:
-Deal with registrations of handlers between period_handler and start_help_handler
 Implement method in period_handler
 Do sync answering messages
 Place the bot to a server

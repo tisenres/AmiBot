@@ -15,8 +15,15 @@ class Tokens:
     auth_token: str = None
 
 
+__tokens = [
+    Tokens.auth_token,
+    Tokens.auth_token,
+    Tokens.auth_token,
+    Tokens.auth_token,
+]
+
+
 def get_auth(host: str, username: str, password: str):
-    
     url = f'https://{host}/'
     
     if username == "" or password == "":
@@ -65,7 +72,7 @@ def get_schedule(auth_token: str, host: str, start_day: datetime, end_day: datet
         "Cookie": auth_token,
         "referer": url
     }
-
+    
     json_conn = http.client.HTTPSConnection(host)
     try:
         json_conn.request("GET", f"/Calendar/home/GetDiaryEvents?start={start_day.strftime(DATE_FORMAT_STRING)}"

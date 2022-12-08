@@ -1,7 +1,9 @@
 import datetime
+import json
 import os
 from dataclasses import dataclass
 from enum import Enum
+from json import JSONDecodeError
 
 import network
 
@@ -65,20 +67,13 @@ def get_schedule(section_num: int, period_type: PeriodType):
     if cred is None:
         raise NotImplementedError
     
-    # try:
-    #     json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
-    #     json.loads(json_data)
-    # except JSONDecodeError:
-    #     auth = network.get_auth(network.HOST, cred.username, cred.password)
-    #     network.Tokens.auth_token = auth
-    #     json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
-    
     try:
-        json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
-    except ConnectionError:
+        json_data = network.get_schedule(network.__tokens[section_num-1], network.HOST, start_day, end_day)
+        json.loads(json_data)
+    except ConnectionError or JSONDecodeError:
         auth = network.get_auth(network.HOST, cred.username, cred.password)
-        network.Tokens.auth_token = auth
-        json_data = network.get_schedule(network.Tokens.auth_token, network.HOST, start_day, end_day)
+        network.__tokens[section_num-1] = auth
+        json_data = network.get_schedule(network.__tokens[section_num-1], network.HOST, start_day, end_day)
     except IndexError:
         raise ConnectionError
     

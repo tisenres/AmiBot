@@ -47,11 +47,11 @@ async def handler_section_button(callback_data: types.CallbackQuery):
                                                          parse_mode='html')
     waiting_for_request_message_id = waiting_for_request_message['message_id']
     
+    await bot.delete_message(callback_data.message.chat.id, waiting_for_request_message_id)
+    
     await period_handler.create_period_markup(callback_data.message.chat.id, callback_data.data)
     await bot.answer_callback_query(callback_data.id)
     
-    await bot.delete_message(callback_data.message.chat.id, waiting_for_request_message_id)
-
 
 def register_start_help_handler(dp: Dispatcher):
     dp.register_message_handler(show_intro_message, commands=['start', 'help'])
@@ -59,6 +59,7 @@ def register_start_help_handler(dp: Dispatcher):
         dp.register_callback_query_handler(handler_section_button, text=f'{section}')
 
     dp.register_message_handler(period_handler.handle_period_button, regexp=period_handler.create_period_regex())
+    dp.register_callback_query_handler(period_handler.handle_additional_button, text='Additional info')
     
     
 def random_sticker():
