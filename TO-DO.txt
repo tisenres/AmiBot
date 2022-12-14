@@ -1,0 +1,4 @@
+TO-DO:
+Implement method in period_handler
+Do sync answering messages
+Place the bot to a server
