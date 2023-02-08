@@ -1,0 +1,8 @@
+meta:
+  environment: python
+  toolchain:
+    name: pip
+    version: 3.10
+
+run:
+  scriptName: main.py
