@@ -1,2 +1,3 @@
 # AmiBot
 test
+New Line
