@@ -13,10 +13,11 @@ class Credential:
     username: str
     password: str
 
+username = os.environ.get("section1_username", "default_username")
+password = os.environ.get("section1_password", "default_password")
 
-# TODO mode section number from start_help_handler to this list and use pairs of values ('1': Credential(.....))
 __credentials = [
-    Credential(username=os.environ["section1_username"], password=os.environ["section1_password"]),
+    Credential(username=username, password=password),
     None,
     None,
     None

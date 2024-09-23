@@ -1,6 +1,9 @@
 import datetime
 import re
 from dataclasses import dataclass
+import ssl
+import certifi
+import http.client
 
 import requests
 import http.client
@@ -66,20 +69,26 @@ def get_auth(host: str, username: str, password: str):
 
 
 def get_schedule(auth_token: str, host: str, start_day: datetime, end_day: datetime):
-    url = f'https://{host}/'
-    
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    ssl_context.load_verify_locations("amizone.crt")  # Load the Amizone certificate
+
+    json_conn = http.client.HTTPSConnection(host, context=ssl_context)
+
     json_headers = {
-        "Cookie": auth_token,
-        "referer": url
+        "Cookie": str(auth_token),
+        "referer": f"https://{host}/"
     }
-    
-    json_conn = http.client.HTTPSConnection(host)
+
     try:
         json_conn.request("GET", f"/Calendar/home/GetDiaryEvents?start={start_day.strftime(DATE_FORMAT_STRING)}"
                                  f"&end={end_day.strftime(DATE_FORMAT_STRING)}&_=1667584748354",
                           None,
                           json_headers)
-    except TypeError:
+    except TypeError as e:
+        print(f"TypeError occurred: {e}")  # For debugging
+        raise ConnectionError
+    except ssl.SSLCertVerificationError as e:
+        print(f"SSL Verification Error: {e}")  # For debugging
         raise ConnectionError
     
     json_res = json_conn.getresponse()
