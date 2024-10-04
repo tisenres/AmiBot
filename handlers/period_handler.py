@@ -1,5 +1,6 @@
 import json
 import re
+from json import JSONDecodeError
 
 from aiogram import Router, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
@@ -57,6 +58,9 @@ async def handle_period_button(message: types.Message):
         await waiting_for_request_message.delete()
         await message.answer("Sorry, I can't reach the server because of technical problems😓")
         return
+    # except JSONDecodeError:
+    #     await waiting_for_request_message.delete()
+    #     await message.answer("Sorry, 😓")
 
     if array:
         schedule_dict = decoder.group_lessons_by_day(array)

@@ -33,26 +33,34 @@ def get_auth(host: str, username: str, password: str):
         raise Exception("Fill password and username")
     
     # First stage
-    get_result = requests.get(url)
-    
-    regex = ".+name=\"loginform\"><input name=\"__RequestVerificationToken\" type=\"hidden\" value=\"(.+?)\".+"
-    arr = re.findall(regex, get_result.text)
-    form_token = arr[0]
-    cookie_token = get_result.cookies.get("__RequestVerificationToken")
-    
+    result = requests.get(url)
+
+    request_verification_token_value = get_param_from_body(result = result, param = "__RequestVerificationToken")
+    salt_value = get_param_from_body(result = result, param = "Salt")
+    secret_value = get_param_from_body(result = result, param = "SecretNumber")
+    signature_value = get_param_from_body(result = result, param = "Signature")
+    challenge_value = get_param_from_body(result = result, param = "Challenge")
+
     # Second stage
     fields = {
-        "__RequestVerificationToken": form_token,
+        "__RequestVerificationToken": request_verification_token_value,
+        "Salt": salt_value,
+        "SecretNumber": secret_value,
+        "Signature": signature_value,
+        "Challenge": challenge_value,
         "_UserName": username,
         "_Password": password,
     }
-    
+
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    ssl_context.load_verify_locations("amizone.crt")  # Load the Amizone certificate
+
     multipart_body, multipart_header = urllib3.encode_multipart_formdata(fields)
-    conn = http.client.HTTPSConnection(host)
+    conn = http.client.HTTPSConnection(host, context=ssl_context)
     
     headers = {
         'Content-Type': multipart_header,
-        'Cookie': f'__RequestVerificationToken={cookie_token}; Path=/; HttpOnly;',
+        'Cookie': f'__RequestVerificationToken={result.cookies.get("__RequestVerificationToken")}; Path=/; HttpOnly;',
     }
     conn.request("POST", "/", multipart_body, headers)
     res = conn.getresponse()
@@ -66,6 +74,14 @@ def get_auth(host: str, username: str, password: str):
         raise ConnectionError
     
     return auth_token
+
+
+def get_param_from_body(result, param):
+    regex = f".+<input.+name=\"{param}\" type=\"hidden\" value=\"(.+?)\".+"
+    arr = re.findall(regex, result.text)
+    param_value = arr[0]
+
+    return param_value
 
 
 def get_schedule(auth_token: str, host: str, start_day: datetime, end_day: datetime):
