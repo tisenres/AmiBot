@@ -2,6 +2,7 @@ import json
 import re
 from json import JSONDecodeError
 
+from Cython.Compiler.Errors import message
 from aiogram import Router, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.markdown import bold
@@ -23,14 +24,14 @@ def create_period_regex():
     return f'^({period_types_string})\\s{SECTION_ACRONYM}\\s(\\d+)$'
 
 
-async def create_period_markup(chat_id: int, section: str):
+async def create_period_markup(message: types.Message, section: str):
     buttons = [
         [KeyboardButton(text=BUTTON_TITLE_FORMAT % (period_type.value, SECTION_ACRONYM, section))]
         for period_type in PeriodType
     ]
     period_markup = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
-    await router.bot.send_message(chat_id, 'Choose period', reply_markup=period_markup)
+    await message.bot.send_message(message.chat.id, 'Choose period', reply_markup=period_markup)
 
 
 @router.message(lambda message: re.match(create_period_regex(), message.text))

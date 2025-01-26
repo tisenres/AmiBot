@@ -48,7 +48,7 @@ async def handle_section_button(callback: types.CallbackQuery):
     waiting_message = await callback.message.answer(bold('Waiting for request🕓'))
     await waiting_message.delete()
 
-    await period_handler.create_period_markup(callback.message.chat.id, section)
+    await period_handler.create_period_markup(callback.message, section)
 
 def random_sticker():
     directory_path = 'welcome_stickers'
