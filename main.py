@@ -1,11 +1,14 @@
-from create_bot import dp
-from aiogram.utils import executor
+import asyncio
+from aiogram import Bot, Dispatcher
+from create_bot import bot
+from handlers import start_help_handler, period_handler
 
-from handlers import start_help_handler, other_handler
 
-start_help_handler.register_start_help_handler(dp)
-other_handler.register_other_handler(dp)
+async def main():
+    dp = Dispatcher()
+    start_help_handler.register_handlers(dp)
+    await dp.start_polling(bot)
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    asyncio.run(main())

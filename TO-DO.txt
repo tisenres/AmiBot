@@ -1,4 +1,8 @@
 TO-DO:
 Implement method in period_handler
 Do sync answering messages
+
+Make additional info feature
+
+Think about other sections
 Deploy bot to server

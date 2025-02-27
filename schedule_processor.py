@@ -2,7 +2,11 @@ import datetime
 import json
 import os
 from dataclasses import dataclass
+from email.policy import default
 from enum import Enum
+
+# from requests import JSONDecodeError
+# from decoder import JSONDecodeError
 from json import JSONDecodeError
 
 import network
@@ -13,10 +17,11 @@ class Credential:
     username: str
     password: str
 
+username = os.environ.get("section1_username", "default_username")
+password = os.environ.get("section1_password", "default_password")
 
-# TODO mode section number from start_help_handler to this list and use pairs of values ('1': Credential(.....))
 __credentials = [
-    Credential(username=os.environ["section1_username"], password=os.environ["section1_password"]),
+    Credential(username=username, password=password),
     None,
     None,
     None
@@ -70,11 +75,14 @@ def get_schedule(section_num: int, period_type: PeriodType):
     try:
         json_data = network.get_schedule(network.__tokens[section_num-1], network.HOST, start_day, end_day)
         json.loads(json_data)
-    except ConnectionError or JSONDecodeError:
+    # except ConnectionError or JSONDecodeError:
+    except JSONDecodeError:
         auth = network.get_auth(network.HOST, cred.username, cred.password)
         network.__tokens[section_num-1] = auth
         json_data = network.get_schedule(network.__tokens[section_num-1], network.HOST, start_day, end_day)
     except IndexError:
         raise ConnectionError
+    except Exception as err:
+        print("Error " + err)
     
     return json_data

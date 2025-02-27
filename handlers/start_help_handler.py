@@ -1,68 +1,61 @@
 import os
 from random import randint
 
-from create_bot import bot
-from aiogram import types, Dispatcher
+from aiogram import Router, types, F
+from aiogram.filters import Command
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.markdown import bold
 
-from design.HtmlDecorator import bold
+from create_bot import bot
 from handlers import period_handler
 
-sections = [
-    '1',
-    '2',
-    '3',
-    '4',
-]
+router = Router()
 
+sections = ['1', '2', '3', '4']
 
-async def show_intro_message(message: types.Message):
-    choose_section = types.InlineKeyboardMarkup(row_width=2)
-    for section in sections:
-        button = types.InlineKeyboardButton(f'Section {section}', callback_data=f'{section}')
-        choose_section.insert(button)
-    
-    if message.text == '/start':
-        
-        sticker = open(random_sticker(), "rb")
-        await bot.send_sticker(message.chat.id, sticker)
+def get_section_keyboard():
+    keyboard = [
+        [InlineKeyboardButton(text=f'Section {section}', callback_data=f'section_{section}')]
+        for section in sections
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
-        await bot.send_message(message.chat.id,
-                               f"{bold(f'Hello, {message.from_user.first_name}! 👋')}"
-                               "\nMy name is AmiBot!\n"
-                               "I can show You the schedule of lessons of Amity University!",
-                               parse_mode='html',
-                               reply_markup=choose_section)
-    
-    elif message.text == '/help':
-        
-        await bot.send_message(message.chat.id,
-                               f'This bot helps You to check lessons schedule at Amity University. \n'
-                               f'Click on the button {bold("below↓")}',
-                               parse_mode='html',
-                               reply_markup=choose_section)
+@router.message(Command("start"))
+async def show_start_message(message: types.Message):
+    sticker_path = random_sticker()
+    await message.answer_sticker(sticker=types.FSInputFile(sticker_path))
 
+    await message.answer(
+        f"{bold(f'Hello, {message.from_user.first_name}! 👋')}\n"
+        "My name is AmiBot!\n"
+        "I can show You the schedule of lessons of Amity University!",
+        reply_markup=get_section_keyboard()
+    )
 
-async def handler_section_button(callback_data: types.CallbackQuery):
-    waiting_for_request_message = await bot.send_message(callback_data.message.chat.id, bold('Waiting for request🕓'),
-                                                         parse_mode='html')
-    waiting_for_request_message_id = waiting_for_request_message['message_id']
-    
-    await bot.delete_message(callback_data.message.chat.id, waiting_for_request_message_id)
-    
-    await period_handler.create_period_markup(callback_data.message.chat.id, callback_data.data)
-    await bot.answer_callback_query(callback_data.id)
-    
+@router.message(Command("help"))
+async def show_help_message(message: types.Message):
+    await message.answer(
+        f'This bot helps You to check lessons schedule at Amity University. \n'
+        f'Click on the button {bold("below↓")}',
+        reply_markup=get_section_keyboard()
+    )
 
-def register_start_help_handler(dp: Dispatcher):
-    dp.register_message_handler(show_intro_message, commands=['start', 'help'])
-    for section in sections:
-        dp.register_callback_query_handler(handler_section_button, text=f'{section}')
+@router.callback_query(F.data.startswith("section_"))
+async def handle_section_button(callback: types.CallbackQuery):
+    section = callback.data.split("_")[1]
+    await callback.answer()
 
-    dp.register_message_handler(period_handler.handle_period_button, regexp=period_handler.create_period_regex())
-    dp.register_callback_query_handler(period_handler.handle_additional_button, text='Additional info')
-    
-    
+    waiting_message = await callback.message.answer(bold('Waiting for request🕓'))
+    await waiting_message.delete()
+
+    await period_handler.create_period_markup(callback.message, section)
+
 def random_sticker():
     directory_path = 'welcome_stickers'
-    number_of_files = os.listdir(path=directory_path)
-    return directory_path + '/' + str(randint(1, len(number_of_files) - 1)) + '.tgs'
+    number_of_files = len(os.listdir(directory_path))
+    return f"{directory_path}/{randint(1, number_of_files)}.tgs"
+
+def register_handlers(dp):
+    dp.include_router(router)
+    # Include period_handler router
+    dp.include_router(period_handler.router)
