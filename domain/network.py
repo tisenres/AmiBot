@@ -13,17 +13,17 @@ HOST = 's.amizone.net'
 DATE_FORMAT_STRING = "%Y-%m-%d"
 
 
-@dataclass
-class Tokens:
-    auth_token: str = None
-
-
-__tokens = [
-    Tokens.auth_token,
-    Tokens.auth_token,
-    Tokens.auth_token,
-    Tokens.auth_token,
-]
+# @dataclass
+# class Tokens:
+#     auth_token: str = None
+#
+#
+# __tokens = [
+#     Tokens.auth_token,
+#     Tokens.auth_token,
+#     Tokens.auth_token,
+#     Tokens.auth_token,
+# ]
 
 
 def get_auth(host: str, username: str, password: str):

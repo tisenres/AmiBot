@@ -1,59 +1,65 @@
 import json
 import re
-from json import JSONDecodeError
+from typing import Optional
 
-from Cython.Compiler.Errors import message
 from aiogram import Router, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.markdown import bold
 
-import decoder
-import schedule_processor
-from handlers import other_handler
-from schedule_processor import PeriodType
+from domain import schedule_processor, decoder
+from domain.schedule_processor import PeriodType
+from vo.Section import Section
 
 router = Router()
 
 SECTION_ACRONYM: str = 'Sec'
 BUTTON_TITLE_FORMAT: str = '%s %s %s'
+selected_section: Optional[Section] = None
 
 
 def create_period_regex():
     enum_values = [enum_value.value for enum_value in PeriodType]
     period_types_string = "|".join(enum_values)
-    return f'^({period_types_string})\\s{SECTION_ACRONYM}\\s(\\d+)$'
+    return f'^({period_types_string})\\s{SECTION_ACRONYM}\\s(\\w+)$'
 
 
-async def create_period_markup(message: types.Message, section: str):
+async def create_period_markup(message: types.Message, section: Section):
+    global selected_section
+    selected_section = section
+
     buttons = [
-        [KeyboardButton(text=BUTTON_TITLE_FORMAT % (period_type.value, SECTION_ACRONYM, section))]
+        [KeyboardButton(text=BUTTON_TITLE_FORMAT % (period_type.value, SECTION_ACRONYM, section.title))]
         for period_type in PeriodType
     ]
     period_markup = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
-    await message.bot.send_message(message.chat.id, 'Choose period', reply_markup=period_markup)
+    await message.bot.send_message(
+        message.chat.id,
+        'Choose period',
+        reply_markup=period_markup,
+    )
 
 
 @router.message(lambda message: re.match(create_period_regex(), message.text))
 async def handle_period_button(message: types.Message):
     period_and_section = re.findall(create_period_regex(), message.text)[0]
 
-    waiting_for_request_message = await message.answer(bold('Waiting for request🕓'))
+    waiting_for_request_message = await message.answer(text='Waiting for request... 🕓')
 
-    if len(period_and_section) != 2:
-        await other_handler.process_other_message(message)
-        return
+    # if len(period) != 2:
+    #     await other_handler.process_other_message(message)
+    #     return
 
+    # section = message.reply_parameters.get("selected_section")
     period = PeriodType.get_by_value(period_and_section[0])
-    section_num = int(period_and_section[1])
 
     try:
-        json_data = schedule_processor.get_schedule(section_num, period)
+        json_data = schedule_processor.get_schedule(selected_section, period)
         await waiting_for_request_message.delete()
         array = json.loads(json_data)
     except NotImplementedError:
         await waiting_for_request_message.delete()
-        await message.answer(f'Non implemented section {bold(f"{section_num}")}\n\n')
+        await message.answer(f'Non implemented section {bold(f"{selected_section}")}\n\n')
         return
     except ConnectionError:
         await waiting_for_request_message.delete()
@@ -85,5 +91,3 @@ async def handle_period_button(message: types.Message):
 async def handle_additional_button(callback: types.CallbackQuery):
     await callback.answer()
     await callback.message.answer('Feature development in process🛠')
-
-# No need for a separate register function, as we're using a router
